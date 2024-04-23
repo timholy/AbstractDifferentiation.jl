@@ -1,4 +1,5 @@
 using AbstractDifferentiation
+using StaticArrays
 using Test, LinearAlgebra
 using Random
 Random.seed!(1234)
@@ -20,6 +21,10 @@ end
 dfjacdx(x, y) = I(length(x))
 dfjacdy(x, y) = Bidiagonal(-ones(length(y)) * 3, ones(length(y) - 1) / 2, :U)
 
+fjac2(x) = [sum(abs2, x) - 1; prod(x)]
+dfjac2dx(x) = [2x'; prod(x) ./ x']
+dfjac2dxdx(x) = permutedims(cat(2I(length(x)), prod(x) ./ (x * x') - Diagonal(diag(prod(x) ./ (x * x'))); dims=3), (3, 1, 2))
+
 # Jvp
 jxvp(x, y, v) = dfjacdx(x, y) * v
 jyvp(x, y, v) = dfjacdy(x, y) * v
@@ -33,6 +38,7 @@ const yscalar = rand()
 
 const xvec = rand(5)
 const yvec = rand(5)
+const sxvec = @SVector rand(5)
 
 # to check if vectors get mutated
 xvec2 = deepcopy(xvec)
@@ -184,7 +190,7 @@ end
 
 function test_hessians(backend; multiple_inputs=false, test_types=true)
     if multiple_inputs
-        # ... but 
+        # ... but
         error("multiple_inputs=true is not supported.")
     else
         # explicit test that AbstractDifferentiation throws an error
@@ -230,6 +236,16 @@ function test_hessians(backend; multiple_inputs=false, test_types=true)
         @test hess4[1] isa Matrix{Float64}
     end
     @test minimum(isapprox.(hess4, hess1, atol=1e-10))
+
+    val, jac, hess = AD.value_jacobian_and_hessian(backend, fjac2, xvec)
+    @test val == fjac2(xvec)
+    @test only(jac) ≈ dfjac2dx(xvec) atol = 1e-10
+    @test only(hess) ≈ dfjac2dxdx(xvec) atol = 1e-10
+
+    val, jac, hess = AD.value_jacobian_and_hessian(backend, fjac2, sxvec)
+    @test val == fjac2(sxvec)
+    @test only(jac) ≈ dfjac2dx(sxvec) atol = 1e-10
+    @test only(hess) ≈ dfjac2dxdx(sxvec) atol = 1e-10
 end
 
 function test_jvp(

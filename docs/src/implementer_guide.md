@@ -1,7 +1,7 @@
 # Implementer guide
 
 !!! warning "Work in progress"
-    
+
     Come back later!
 
 ## The macro `@primitive`
@@ -37,6 +37,7 @@ They are just listed here to help readers figure out the code structure:
   - `value_and_second_derivative` calls `second_derivative`
   - `value_gradient_and_hessian` calls `value_and_jacobian` and `gradient`
   - `value_derivative_and_second_derivative` calls `value_and_derivative` and `second_derivative`
+  - `value_jacobian_and_hessian` calls `value_and_jacobian` and `jacobian`
   - `pushforward_function` calls `jacobian`
   - `value_and_pushforward_function` calls `pushforward_function`
   - `pullback_function` calls `value_and_pullback_function`

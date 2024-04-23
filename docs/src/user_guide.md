@@ -75,6 +75,7 @@ AbstractDifferentiation.value_and_second_derivative
 AbstractDifferentiation.value_and_hessian
 AbstractDifferentiation.value_derivative_and_second_derivative
 AbstractDifferentiation.value_gradient_and_hessian
+AbstractDifferentiation.value_jacobian_and_hessian
 ```
 
 ## Jacobian-vector products
